@@ -13,14 +13,14 @@ class PAMAP:
 	RAW = 0
 	PROCESSED = 1
 
-	NUM_SUBJECTS = 8
+	NUM_SUBJECTS = 3
 	CLASSES = {
 		1 : 0,		2 : 1,		3 : 2,		4 : 3,		5 : 4,		6 : 5,
 		7 : 6,		12 : 7,		13 : 8,		16 : 9,		17 : 10,	24 : 11	
 	}
 
 	def __init__ ( self, source ):
-		self.data = { 'features' : [], 'class' : [] }
+		self.data = []
 		if ( source == self.RAW ):
 			self.load_raw()
 		elif ( source == self.PROCESSED ):
@@ -41,8 +41,10 @@ class PAMAP:
 			filename = os.path.join( data_path, 'subject10' + str(subject + 1) + '.dat' )
 			with open(filename) as f:
 				data = np.genfromtxt( self.filter_transitions( f, 1 ), delimiter = ' ', missing_values = '?', filling_values = 0 )
-				self.data['features'].append( data[:, 2:] )
-				self.data['class'].append( map( lambda c : self.CLASSES[c], data[:, 1] ) )
+			self.data.append([{ 
+				'features' : x[2:], 
+				'class' : self.CLASSES[x[1]]
+			} for x in data ])
 
 	def load_processed ( self ):
 		base_path = os.path.dirname( __file__ )
@@ -51,19 +53,17 @@ class PAMAP:
 			filename = os.path.join( data_path, 'subject10' + str(subject + 1) + '.dat' )
 			with open(filename) as f:
 				data = np.genfromtxt( self.filter_transitions( f, -1 ), delimiter = ' ' )
-				self.data['features'].append( data[:, :-1] )
-				self.data['class'].append( map( lambda c : self.CLASSES[c], data[:, -1] ) )
-
+				
+			self.data.append([{
+				'features' : x[:-1], 
+				'class' : self.CLASSES[x[-1]] 
+			} for x in data ])
 
 	def cross_validation ( self, fold ):
 		return { 
-			'train' : { 
-				'features' : [ x for l in (self.data['features'][:fold] + self.data['features'][fold+1:]) for x in l ], 
-				'class' : [ x for l in (self.data['class'][:fold] + self.data['class'][fold+1:]) for x in l ]
-			},
-			'test' : { 'features' : self.data['features'][fold], 'class' : self.data['class'][fold] }
+			'train' : [ x for l in (self.data[:fold-1] + self.data[fold:]) for x in l ],
+			'test'  : self.data[fold-1]
 		}
-
 
 	def random_sample ( self, dataset, sample_pct ):
 		return random.sample( dataset, int(sample_pct * len( dataset )) )
