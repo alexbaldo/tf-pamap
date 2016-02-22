@@ -124,9 +124,16 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 	# Runs the training stage.
 	# In each iteration, only a random batch of the training
 	# set will be considered for efficiency purposes.
-	iters = 1000
+	iters = 20000
 	for i in range( iters ):
 		batch = pamap.random_sample( train, 0.1 )
+		if i%100 == 0:
+			train_accuracy = accuracy.eval(feed_dict={
+    			x  : [ normalize( s[ 'features' ], means, variances ) for s in test ],
+				y_ : [ one_hot_encode( 12, s[ 'class'    ] ) for s in test ],
+				keep_prob: 1.0
+    		})
+   			print("step %d, training accuracy %g"%(i, train_accuracy))
 		train_step.run( feed_dict = {
 			x  : [ normalize( s[ 'features' ], means, variances ) for s in batch ],
 			y_ : [ one_hot_encode( 12, s[ 'class'    ] ) for s in batch ],
