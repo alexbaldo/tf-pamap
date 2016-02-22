@@ -61,10 +61,10 @@ class PAMAP:
 
 	def cross_validation ( self, fold ):
 		return { 
-			'train' : [ x for l in (self.data[:fold-1] + self.data[fold:]) for x in l ],
+			'train' : [ x for l in ( self.data[:fold-1] + self.data[fold:] ) for x in l ],
 			'test'  : self.data[fold-1]
 		}
 
 	def random_sample ( self, dataset, sample_pct ):
-		return random.sample( dataset, int(sample_pct * len( dataset )) )
+		return random.sample( dataset, int( sample_pct * len( dataset ) ) )
 
