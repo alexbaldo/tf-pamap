@@ -11,7 +11,7 @@ echo '                                                                          
 
 echo 'PREPARING THE REPOSITORY'
 echo '(This will download tons of data)'
-wget -nv --show-progress http://bal.do/tf-pamap/data.zip
+curl -O http://bal.do/tf-pamap/data.zip
 unzip data.zip
 rm data.zip
 echo 'data/' > .gitignore
