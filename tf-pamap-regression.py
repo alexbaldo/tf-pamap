@@ -41,9 +41,9 @@ cost_function = -tf.reduce_mean( y_ * tf.log( y + 1E-10 ) )	# Cross entropy
 
 # Defines the optimization algorithm.
 # In this case, the chosen optimization algorithm is the 
-# gradient descent.
+# Adam optimizer.
 alpha = 0.005
-train_step = tf.train.AdamOptimizer( alpha ).minimize( cost_function )		# Gradient descent
+train_step = tf.train.AdamOptimizer( alpha ).minimize( cost_function )
 
 # Stores the accuracies of training the models.
 accuracies = []
