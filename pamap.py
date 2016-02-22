@@ -19,6 +19,10 @@ class PAMAP:
 		7 : 6,		12 : 7,		13 : 8,		16 : 9,		17 : 10,	24 : 11	
 	}
 
+	LABELS = ['lying', 'sitting', 'standing', 'walking', 'running', 'cycling', 
+			  'nordic walking'  , 'ascending stairs'   , 'descending stairs' ,
+			  'vacuum cleaning' , 'ironing'            , 'rope jumping'       ]
+
 	def __init__ ( self, source ):
 		self.data = []
 		if ( source == self.RAW ):
