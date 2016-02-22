@@ -13,7 +13,7 @@ class PAMAP:
 	RAW = 0
 	PROCESSED = 1
 
-	NUM_SUBJECTS = 3
+	NUM_SUBJECTS = 8
 	CLASSES = {
 		1 : 0,		2 : 1,		3 : 2,		4 : 3,		5 : 4,		6 : 5,
 		7 : 6,		12 : 7,		13 : 8,		16 : 9,		17 : 10,	24 : 11	
