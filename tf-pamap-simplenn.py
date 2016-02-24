@@ -34,7 +34,7 @@ def max_pool_2x1( x ):
 # Loads the already-processed PAMAP2 dataset.
 # In this processed dataset, features are a statistical summary
 # resulting from the FFT of a 512-instances sliding window.
-pamap = PAMAP( PAMAP.PROCESSED_FILTERED, PAMAP.FILTER_MTS)
+pamap = PAMAP( PAMAP.PROCESSED_FILTERED, PAMAP.NO_FILTER)
 
 # Starts the TensorFlow interactive session.
 sess = tf.InteractiveSession()
@@ -129,7 +129,7 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 	# Runs the training stage.
 	# In each iteration, only a random batch of the training
 	# set will be considered for efficiency purposes.
-	iters = 25000
+	iters = 5000
 	for i in range( iters ):
 		batch = pamap.random_sample( train, 0.1 )
 		if i%100 == 0:
