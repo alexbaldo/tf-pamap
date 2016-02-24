@@ -137,7 +137,7 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 			y_ : [ one_hot_encode( 12, s[ 'class'    ] ) for s in test ],
 			keep_prob: 1.0
 		})
-   		print("step %d, training accuracy %g"%(i, train_accuracy))
+   		print("Subject " + str(subject) + " step %d, training accuracy %g"%(i, train_accuracy))
 		train_step.run( feed_dict = {
 			x  : [ normalize( s[ 'features' ], means, variances ) for s in batch ],
 			y_ : [ one_hot_encode( 12, s[ 'class'    ] ) for s in batch ],
