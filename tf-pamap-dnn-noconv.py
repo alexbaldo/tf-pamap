@@ -32,7 +32,7 @@ def max_pool_2x1( x ):
   return tf.nn.max_pool( x, ksize=[1, 2, 1, 1], strides=[1, 2, 1, 1], padding='SAME' )
 
 # Loads the already-processed PAMAP2 dataset.
-# In this processed dataset, features are a statistical summary
+# In this processed dataset, features are a statistical summary
 # resulting from the FFT of a 512-instances sliding window.
 pamap = PAMAP( PAMAP.PROCESSED )
 
@@ -41,26 +41,26 @@ sess = tf.InteractiveSession()
 
 # Placeholders will be filled with data from the PAMAP dataset.
 # Shapes specify the dimensions of data inputs and outputs.
-x  = tf.placeholder( tf.float32, shape=[ None, 280 ] )		# Number of features: 
+x  = tf.placeholder( tf.float32, shape=[ None, 280 ] )		# Number of features:
 y_ = tf.placeholder( tf.float32, shape=[ None, 12  ] )  	# Number of classes: 12
 
 # L1 - DENSE LAYER
 # Input: 280
-# 1024 neurons
+# 1024 neurons
 W1 = weight_variable([ 280, 1024 ])
 b1 = bias_variable([ 1024 ])
 h1 = tf.nn.relu( tf.matmul( x, W1 ) + b1 )
 
 # L2 - DENSE LAYER
 # Input: 1024
-# 32 * 1024 neurons
+# 32 * 1024 neurons
 W2 = weight_variable([ 1024, 32 * 1024 ])
 b2 = bias_variable([ 32 * 1024 ])
 h2 = tf.nn.relu( tf.matmul( h1, W2 ) + b2 )
 
 # L3 - DENSE LAYER
 # Input: 4096
-# 32 * 1024 neurons
+# 32 * 1024 neurons
 W3 = weight_variable([ 32 * 1024, 4096 ])
 b3 = bias_variable([ 4096 ])
 h3 = tf.nn.relu( tf.matmul( h2, W3 ) + b3 )
@@ -69,7 +69,7 @@ h3 = tf.nn.relu( tf.matmul( h2, W3 ) + b3 )
 keep_prob  = tf.placeholder( tf.float32 )
 hdrop = tf.nn.dropout( h3, keep_prob )
 
-# LO - SOFTMAX LAYER
+# LO - SOFTMAX LAYER
 Ws = weight_variable([ 4096, 12 ])
 bs = bias_variable([ 12 ])
 y = tf.nn.softmax( tf.matmul( hdrop, Ws ) + bs )
@@ -77,8 +77,8 @@ y = tf.nn.softmax( tf.matmul( hdrop, Ws ) + bs )
 # Defines the cost function to be minimized.
 cost_function = -tf.reduce_mean( y_ * tf.log( y + 1E-10 ) )	# Cross entropy
 
-# Defines the optimization algorithm.
-# In this case, the chosen optimization algorithm is the 
+# Defines the optimization algorithm.
+# In this case, the chosen optimization algorithm is the
 # Adam optimizer.
 alpha = 0.001
 train_step = tf.train.AdamOptimizer( alpha ).minimize( cost_function )
@@ -95,7 +95,7 @@ accuracies = []
 for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 
 	# Loads the LOSO-CV (leave-one-subject-out cross validation for
-	# one fold.
+	# one fold.
 	data  = pamap.cross_validation( subject )
 	train = data[ 'train' ]
 	test  = data[ 'test'  ]
@@ -110,7 +110,7 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 
 	# Runs the training stage.
 	# In each iteration, only a random batch of the training
-	# set will be considered for efficiency purposes.
+	# set will be considered for efficiency purposes.
 	iters = 20000
 	for i in range( iters ):
 		batch = pamap.random_sample( train, 0.1 )
