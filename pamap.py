@@ -8,6 +8,7 @@ import os
 import numpy as np
 import random
 
+
 class PAMAP:
 
 	RAW = 0
