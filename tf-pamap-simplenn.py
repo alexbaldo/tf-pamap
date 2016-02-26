@@ -34,14 +34,15 @@ def max_pool_2x1( x ):
 # Loads the already-processed PAMAP2 dataset.
 # In this processed dataset, features are a statistical summary
 # resulting from the FFT of a 512-instances sliding window.
-pamap = PAMAP( PAMAP.PROCESSED )
+pamap = PAMAP( PAMAP.PROCESSED_FILTERED, PAMAP.NO_FILTER)
 
 # Starts the TensorFlow interactive session.
 sess = tf.InteractiveSession()
 
 # Placeholders will be filled with data from the PAMAP dataset.
 # Shapes specify the dimensions of data inputs and outputs.
-x  = tf.placeholder( tf.float32, shape=[ None, 280 ] )		# Number of features: 
+
+x  = tf.placeholder( tf.float32, shape=[ None, pamap.features ] )		# Number of features:
 y_ = tf.placeholder( tf.float32, shape=[ None, 12  ] )  	# Number of classes: 12
 
 # Reshapes the input data to a more accurate representation
@@ -73,9 +74,9 @@ y_ = tf.placeholder( tf.float32, shape=[ None, 12  ] )  	# Number of classes: 12
 # Input:
 # 280 features
 # 280 neurons
-W_fc1 = weight_variable([ 280, 1024 ])
-b_fc1 = bias_variable([ 1024 ])
-h_pool2_flat = tf.reshape( x, [-1, 280] )
+W_fc1 = weight_variable([ pamap.features, pamap.features ])
+b_fc1 = bias_variable([ pamap.features ])
+h_pool2_flat = tf.reshape( x, [-1, pamap.features] )
 h_fc1 = tf.nn.relu( tf.matmul( h_pool2_flat, W_fc1 ) + b_fc1 )
 
 
@@ -84,7 +85,7 @@ keep_prob  = tf.placeholder( tf.float32 )
 h_fc1_drop = tf.nn.dropout( h_fc1, keep_prob )
 
 # LO - SOFTMAX LAYER
-W_fc2 = weight_variable([ 1024, 12 ])
+W_fc2 = weight_variable([ pamap.features, 12 ])
 b_fc2 = bias_variable([ 12 ])
 y = tf.nn.softmax( tf.matmul( h_fc1_drop, W_fc2 ) + b_fc2 )
 
@@ -96,8 +97,8 @@ cost_function = -tf.reduce_mean( y_ * tf.log( y + 1E-10 ) )	# Cross entropy
 # Defines the optimization algorithm.
 # In this case, the chosen optimization algorithm is the 
 # Adam optimizer.
+#alpha = 0.001
 alpha = 0.001
-#alpha = 0.0005
 train_step = tf.train.AdamOptimizer( alpha ).minimize( cost_function )
 
 # Defines the function that establishes whether a prediction is correct.
@@ -137,12 +138,14 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 				y_ : [ one_hot_encode( 12, s[ 'class'    ] ) for s in test ],
 				keep_prob: 1.0
 			})
-	   		print("step %d, training accuracy %g"%(i, train_accuracy))
-			train_step.run( feed_dict = {
-				x  : [ normalize( s[ 'features' ], means, variances ) for s in batch ],
-				y_ : [ one_hot_encode( 12, s[ 'class'    ] ) for s in batch ],
-				keep_prob: 0.5
-			})
+
+			print("Subject " + str(subject) + " - step %d, training accuracy %g"%(i, train_accuracy))
+		
+		train_step.run( feed_dict = {
+			x  : [ normalize( s[ 'features' ], means, variances ) for s in batch ],
+			y_ : [ one_hot_encode( 12, s[ 'class'    ] ) for s in batch ],
+			keep_prob: 0.5
+		})
 
 	# Computes the accuracy of the classifier using the test set.
 	model_accuracy = accuracy.eval( feed_dict = {

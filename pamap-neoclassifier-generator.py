@@ -21,7 +21,10 @@ def open_file ( subject, settype ):
 # Loads the already-processed PAMAP2 dataset.
 # In this processed dataset, features are a statistical summary
 # resulting from the FFT of a 512-instances sliding window.
-pamap = PAMAP( PAMAP.PROCESSED )
+#pamap = PAMAP( PAMAP.PROCESSED ) => processed with FFT instance
+
+
+pamap = PAMAP( PAMAP.PROCESSED ) # processed with FFT
 
 # Iterates through all PAMAP2 subjects.
 for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
