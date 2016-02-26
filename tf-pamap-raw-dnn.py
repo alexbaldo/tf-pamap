@@ -116,18 +116,10 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 	# Runs the training stage.
 	# In each iteration, only a random batch of the training
 	# set and the test set will be considered for efficiency purposes.
-	iters = 5000
+	iters = 10000
 	for i in range( iters ):
-		train_batch = pamap.random_window_batch( train, W, 0.01 * len( train ) )
-		test_batch  = pamap.random_window_batch( test , W, 0.01 * len( test  ) )
-		print "Batches created!"
-		test_accuracy = accuracy.eval( feed_dict={
-			x  : [[ s[ 'features' ] for s in w ] for w in test_batch ],
-			y_ : [ one_hot_encode( 12, w[ 0 ][ 'class' ] ) for w in test_batch ],
-			keep_prob: 1.0
-		})
-   		print("step %d, test accuracy %g"%(i, test_accuracy))
-		
+		train_batch = pamap.random_window_batch( train, W, 700 )
+		test_batch  = pamap.random_window_batch( test , W, 100 )
 
 		train_step.run( feed_dict = {
 			x  : [[ s[ 'features' ] for s in w ] for w in train_batch ],
@@ -135,6 +127,14 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 			keep_prob: 0.5
 		})
 
+		if i % 10:
+			test_accuracy = accuracy.eval( feed_dict={
+				x  : [[ s[ 'features' ] for s in w ] for w in test_batch ],
+				y_ : [ one_hot_encode( 12, w[ 0 ][ 'class' ] ) for w in test_batch ],
+				keep_prob: 1.0
+			})
+   			print("Subject %d - step %d, training accuracy %g"%(subject, i, test_accuracy))
+		
 	# Computes the accuracy of the classifier using the test set.
 	test_batch  = pamap.random_window_batch( test , W, 0.1 * len( test  ) )
 	model_accuracy = accuracy.eval( feed_dict = {
