@@ -54,7 +54,7 @@ accuracy = tf.reduce_mean( tf.cast( correct_prediction, tf.float32 ) )
 accuracies = []
 
 # Iterates through all PAMAP2 subjects.
-for subject in range( 1, 2 ):
+for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 
 	# Loads the LOSO-CV (leave-one-subject-out cross validation for
 	# one fold.
