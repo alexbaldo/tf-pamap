@@ -2,6 +2,7 @@
 from pamap import PAMAP
 import tensorflow as tf
 import numpy as np
+import sys
 
 # Defines the window size.
 W = 256
@@ -38,7 +39,7 @@ sess = tf.InteractiveSession()
 
 # Placeholders will be filled with data from the PAMAP dataset.
 # Shapes specify the dimensions of data inputs and outputs.
-x  = tf.placeholder( tf.float32, shape=[ None, W, 40 ] )		# Number of features: W * 40
+x  = tf.placeholder( tf.float32, shape=[ None, W*40 ] )			# Number of features: W * 40
 y_ = tf.placeholder( tf.float32, shape=[ None, 12  ] )  		# Number of classes: 12
 
 # Reshapes the input data to a more accurate representation
@@ -95,6 +96,7 @@ train_step = tf.train.AdamOptimizer( alpha ).minimize( cost_function )
 
 # Defines the function that establishes whether a prediction is correct.
 # Also, defines the function used for measuring the classifier accuracy.
+outputs = tf.argmax( y, 1 )
 correct_prediction = tf.equal( tf.argmax( y, 1 ), tf.argmax( y_, 1 ) )
 accuracy = tf.reduce_mean( tf.cast( correct_prediction, tf.float32 ) )
 
@@ -117,31 +119,35 @@ for subject in range( 1, pamap.NUM_SUBJECTS + 1 ):
 	# In each iteration, only a random batch of the training
 	# set and the test set will be considered for efficiency purposes.
 	iters = 10000
-        test_batch  = pamap.random_window_batch( test , W, 100 )
+	test_batch  = pamap.random_window_batch( test , W, 100 )
 	for i in range( iters ):
 		train_batch = pamap.random_window_batch( train, W, 300 )
+		print outputs.eval( feed_dict={
+            y  : [ one_hot_encode( 12, w[ 0 ][ 'class' ] ) for w in train_batch ],
+			keep_prob: 1.0 
+		}).tolist()
 		train_step.run( feed_dict = {
-			x  : [[ s[ 'features' ] for s in w ] for w in train_batch ],
+			x  : [np.asarray([ s[ 'features' ] for s in w ]).flatten() for w in train_batch ],
 			y_ : [ one_hot_encode( 12, w[ 0 ][ 'class' ] ) for w in train_batch ],
 			keep_prob: 0.5
 		})
 		print sess.run(W_fc1)
 		print sess.run(b_fc1)
-		print tf.argmax( y, 1 ).eval( feed_dict={
-                        x  : [[ s[ 'features' ] for s in w ] for w in test_batch ],
+		print outputs.eval( feed_dict={
+            x  : [np.asarray([ s[ 'features' ] for s in w ]).flatten() for w in test_batch ],
 			keep_prob: 1.0 
-		})
+		}).tolist()
 		test_accuracy = accuracy.eval( feed_dict={
-			x  : [[ s[ 'features' ] for s in w ] for w in test_batch ],
+			x  : [np.asarray([ s[ 'features' ] for s in w ]).flatten() for w in test_batch ],
 			y_ : [ one_hot_encode( 12, w[ 0 ][ 'class' ] ) for w in test_batch ],
 			keep_prob: 1.0
 		})
-   		print("Subject %d - step %d, training accuracy %g"%(subject, i, test_accuracy))
+   		print("Subject %d - step %d, test accuracy %g"%(subject, i, test_accuracy))
 		
 	# Computes the accuracy of the classifier using the test set.
 	test_batch  = pamap.random_window_batch( test , W, 0.1 * len( test  ) )
 	model_accuracy = accuracy.eval( feed_dict = {
-		x  : [[ s[ 'features' ] for s in w ] for w in test_batch ],
+		x  : [np.asarray([ s[ 'features' ] for s in w ]).flatten() for w in test_batch ],
 		y_ : [ one_hot_encode( 12, w[ 0 ][ 'class' ] ) for w in test_batch ],
 		keep_prob: 1.0
 	})

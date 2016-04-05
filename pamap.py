@@ -14,6 +14,8 @@ class PAMAP:
 
 	RAW = 0
 	PROCESSED = 1
+	
+	'''
 	PROCESSED_FILTERED = 2
 
 	FILTER_GA = "01010101000101110001010000000000101101001001011110011100001001100010000010011001000001101000100000111110" \
@@ -27,14 +29,13 @@ class PAMAP:
 	NO_FILTER = "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" \
 			"1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" \
 			"11111111111111111111111111111111111111111111111111111111111111111111111111"
+	'''
 
 	NUM_SUBJECTS = 8
 	CLASSES = {
 		1 : 0,		2 : 1,		3 : 2,		4 : 3,		5 : 4,		6 : 5,
 		7 : 6,		12 : 7,		13 : 8,		16 : 9,		17 : 10,	24 : 11	
 	}
-
-
 
 	LABELS = ['lying', 'sitting', 'standing', 'walking', 'running', 'cycling', 
 			  'nordic walking'  , 'ascending stairs'   , 'descending stairs' ,
@@ -72,7 +73,7 @@ class PAMAP:
 		for subject in range( self.NUM_SUBJECTS ):
 			filename = os.path.join( data_path, 'subject10' + str(subject + 1) + '.dat' )
 			with open(filename) as f:
-				data = np.genfromtxt( self.filter_transitions( f, -1 ), delimiter = ' ' )
+				data = np.genfromtxt( f, delimiter = ' ' )
 				
 			self.data.append([{
 				'features' : x[:-1], 
@@ -140,6 +141,7 @@ class PAMAP:
 
 		return batch
 
+	'''
 	def get_column_list ( self, binary_filter ):
 		# Transform 010101.. to column number list zero based (1, 4, 5) => extract 2nd column, 5th and 6th
 		selected_columns = []
@@ -155,3 +157,4 @@ class PAMAP:
 		self.features = n_sel
 		selected_columns.append(n_col) #Always add the class
 		return selected_columns
+	'''
